@@ -5,16 +5,17 @@ var Commands = function() { };
 Commands.prototype.check = function(client, cmd, args) {
 
     switch(cmd){
-        case 'status':
+        case '.status':
             console.log('status');
+            debugger;
             this.status(client);
             break;
-        case 'setname':
+        case '.setname':
             console.log('setname');
             console.log(args[0]);
             this.setname(client, args[0]);
             break;
-        case 'echo':
+        case '.echo':
             console.log('echoing ' + args.join(' '));
             this.echo(client, args.join(' '));
             break;

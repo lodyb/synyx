@@ -16,6 +16,9 @@ Player.prototype.remove = function(name) {
 };
 
 Player.prototype.get_names =  function() {
+    debugger;
+    console.log(this.client_ls); // why does this work
+    console.log(this);
     return Object.keys(this.client_ls);
 };
 
@@ -26,6 +29,23 @@ Player.prototype.get_clients = function() {
         result.push(this.client_ls[keys[i]]);
     }
     return result;
+};
+
+Player.prototype.relay = function(client, message) {
+    debugger;
+    //var keys = Object.keys(this.client_ls);
+    //console.log(keys.length);
+    //console.log(keys.toString());
+    //console.log(' b : ' + this.client_ls.length);
+    console.log(this.client_ls); // and this doesn't
+    console.log(this);
+    /*for (var i = 0; i < keys.length; i++) {
+        console.log(keys[i] + ' == ' + client.name);
+        if (keys[i] != client.name) {
+            console.log(' pancake : ' + this.client_ls[keys[i]].name);
+            this.client_ls[keys[i]].writelns(client.name + ': ' + message);
+        }
+    }*/
 };
 
 module.exports.create = Player;

@@ -1,4 +1,4 @@
 synyx
-=====
-
-node.js telnet chat server / game
+=====
+
+node.js telnet chat server / game

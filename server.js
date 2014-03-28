@@ -56,8 +56,12 @@ telnet.createServer(function (client) {
         }
         client.write(b);
         if (b == '\r\n') {
-          process_cmd(buffer);
           console.log(client.name + ": " + buffer);
+          if (buffer[0] == '.') { 
+              process_cmd(buffer);
+          }
+          debugger;
+          pl.relay(client, buffer);
           buffer =  '';
           client.write('[1;36m >: [1;0m');
         }
