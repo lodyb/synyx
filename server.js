@@ -1,12 +1,19 @@
 
 var telnet = require('telnet');
-var players = require('./players'), pl = new players.create();
 var commands = require('./commands'), cmd = new commands.create();
+var players = require('./players'), ply = new players.create();
 
 telnet.createServer(function (client) {
     client.do.transmit_binary();
     client.do.window_size();
     
+    // todo: why doesn't write functions work on putty telnet
+    // which is supposedly a better telnet client
+    // does this work on other telnet implementations?
+    // does the server still respond to events when using
+    // other telnet clients
+    // needs research
+    // -- open to anyone
     client.writes = function(str) {
       client.write(str);
     }
@@ -19,6 +26,11 @@ telnet.createServer(function (client) {
     ,   buffer = ''
     ,   width = 80
     ,   version = '0.0.1';
+
+    // todo: add back error handler
+    // it needs to remove client from players list
+    // same as on exit, close, data etc.
+    // -- open to anyone
   
     client.on('window size', function (e) {
        if (e.command === 'sb') {
@@ -27,25 +39,19 @@ telnet.createServer(function (client) {
 
     client.on('exit', function (e) {
         console.log(client.name + " has left [exit]");
-        pl.remove(client.name);
+        ply.remove(client.name);
 
     });
 
     client.on('close', function (e) {
         console.log(client.name + " has left [close]");
-        pl.remove(client.name);
+        ply.remove(client.name);
     });
 
     client.on('end', function (e) {
         console.log(client.name + " has left [end]");
-        pl.remove(client.name);
+        ply.remove(client.name);
     });
-
-    function process_cmd(buffer){
-        var args = buffer.split(' ');
-        var cmd_actual = args.shift();
-        cmd.check(client, cmd_actual, args);
-    }
 
     client.on('data', function (b) {
         if (b == '\b') {
@@ -60,8 +66,7 @@ telnet.createServer(function (client) {
           if (buffer[0] == '.') { 
               process_cmd(buffer);
           }
-          debugger;
-          pl.relay(client, buffer);
+          ply.relay_msg(client, buffer);
           buffer =  '';
           client.write('[1;36m >: [1;0m');
         }
@@ -70,6 +75,12 @@ telnet.createServer(function (client) {
         }
     });
 
+    function process_cmd(buffer){
+        var args = buffer.split(' ');
+        var cmd_actual = args.shift();
+        cmd.check(client, cmd_actual, args);
+    }
+
     function write_center(b){
         var data_length = b.length
         ,   spaces = Array(Math.ceil(width/2 - data_length/2)).join(" ");
@@ -77,6 +88,9 @@ telnet.createServer(function (client) {
         client.write(b);
     }
 
+    // todo: rainbow colour strips also a clear line before
+    // so its not too near the top
+    // -- open to anyone
     write_center(' .oooo.o oooo    ooo ooo. .oo.   oooo    ooo oooo    ooo\n');
     write_center('d88(  \"8  `88.  .8\'  `888P\"Y88b   `88.  .8\'   `88b..8P\' \n');
     write_center('`\"Y88b.    `88..8\'    888   888    `88..8\'      Y888\'  \n');
@@ -86,5 +100,9 @@ telnet.createServer(function (client) {
     write_center('`Y8P\'      v'+version+'       `Y8P\'        \n\n');
 
     client.write('[1;36m >: [1;0m');
+
+    // todo: perhaps add a greet message or some useful information
+    // for newly connecting users
+    // -- open to anyone
 
 }).listen(27015);
